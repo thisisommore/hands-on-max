@@ -153,6 +153,81 @@ class OX {
         return false;
     }
 
+    int[] posWin(int player, int row, int col) {
+        int winnerProd = player * player * B;
+        int prod = 1;
+
+        int blankRow = -1;
+        int blankCol = -1;
+        // Check for horizontal;
+        for (int c = 0; c < 3; c++) {
+            prod *= board[row][c];
+            if (B == board[row][c]) {
+                blankRow = row;
+                blankCol = c;
+            }
+        }
+        if (prod == winnerProd) {
+            return new int[] { blankRow, blankCol };
+        }
+
+        blankRow = -1;
+        blankCol = -1;
+        prod = 1;
+        // Check for vertical;
+        for (int r = 0; r < 3; r++) {
+            prod *= board[r][col];
+            if (B == board[r][col]) {
+                blankRow = r;
+                blankCol = col;
+            }
+        }
+        if (prod == winnerProd) {
+            return new int[] { blankRow, blankCol };
+        }
+
+        // Check for diago
+        blankRow = -1;
+        blankCol = -1;
+        prod = 1;
+
+        if ((row == 0 || row % 2 == 0) && (col == 0 || col % 2 == 0)) {
+            if (row == 0 && col == 2) {
+                int nC = 2;
+                for (int nR = 0; nR < 3; nR++) {
+                    prod *= board[nR][nC];
+                    if (B == board[nR][nC]) {
+                        blankRow = nR;
+                        blankCol = nC;
+                    }
+                    nC--;
+                }
+                if (prod == winnerProd) {
+                    return new int[] { blankRow, blankCol };
+                }
+            }
+
+            prod = 1;
+            if (row == 0 && col == 0) {
+                for (int cI = 0; cI < 3; cI++) {
+                    prod *= board[cI][cI];
+                    if (B == board[cI][cI]) {
+                        blankRow = cI;
+                        blankCol = cI;
+                    }
+                }
+                if (prod == winnerProd) {
+                    return new int[] { blankRow, blankCol };
+                }
+            }
+        }
+
+        blankRow = -1;
+        blankCol = -1;
+
+        return new int[] { blankRow, blankCol };
+    }
+
     void printArray() {
         String format = "------------" + "\n" +
                 " %s | %s | %s" + "\n" +
