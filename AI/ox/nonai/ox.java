@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -8,7 +7,7 @@ public class ox {
     }
 }
 
-public class OX {
+class OX {
     int X = 3, O = 5, B = 2;
     int board[][] = { { B, B, B }, { B, B, B }, { B, B, B } };
     int user;
@@ -71,8 +70,8 @@ public class OX {
 
     void markRandom(int player) {
         Random rand = new Random();
-        int col = rand.nextInt(0, 3);
-        int row = rand.nextInt(0, 3);
+        int col = rand.nextInt(3);
+        int row = rand.nextInt(3);
         boolean res = mark(player, row, col);
         if (!res) {
             markRandom(player);
