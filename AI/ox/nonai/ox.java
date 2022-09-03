@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -11,94 +12,97 @@ class OX {
     int X = 3, O = 5, B = 2;
     int board[][] = { { B, B, B }, { B, B, B }, { B, B, B } };
     int user;
-
+    int oppo;
+    Scanner scanner = new Scanner(System.in);
     OX() {
         // Row, Col
-        Scanner scanner = new Scanner(System.in);
+        
         System.out.println("Select X or O");
         String selectedPlayer = scanner.next();
-        int player;
+        
         if (selectedPlayer.charAt(0) == 'X') {
-            player = X;
+            oppo = X;
         } else if (selectedPlayer.charAt(0) == 'O') {
-            player = O;
+            oppo = O;
         } else {
             System.out.println("Input is invalid");
             return;
         }
-        System.out.println("You are " + getBoardChar(player));
-        for (int i = 0; i < 10; i++) {
-            if (player == O) {
-                markRandom(X);
-                printArray();
-                if (isWin(X)) {
-                    System.out.println(getBoardChar(X) + " is winner");
-                    return;
-                }
-            }
-            System.out.println("Enter Position : ");
-            System.out.print("Row : ");
+        System.out.println("You are " + getBoardChar(oppo));
+        startGame();
+    }
+
+    void startGame(){
+           if(oppo == X){
             int row = scanner.nextInt();
-            System.out.print("Col : ");
             int col = scanner.nextInt();
-            boolean res = mark(player, row - 1, col - 1);
+            go(oppo, row, col);
             printArray();
-            if (isWin(player)) {
-                System.out.println(getBoardChar(player) + " is winner");
-                return;
+            boolean mark = go(O, 1, 1);
+            if(mark){
+                go(O,0,0);
+                
             }
-            if (!res) {
-                System.out.println("It is already marked");
-                i--;
-                continue;
-            }
-            if (isWin(O)) {
-                System.out.println("O is winner");
-                return;
-            }
+           }else{
+            go(X, 1, 1);
+            
+           }
+           printArray();
 
-            if (player == X) {
-                markRandom(O);
-                printArray();
-                if (isWin(O)) {
-                    System.out.println(getBoardChar(O) + " is winner");
-                    return;
-                }
-            }
-        }
+           int row = scanner.nextInt();
+           int col = scanner.nextInt();
+           go(oppo, row, col);
+           printArray();
+           int[] blankCord = posWin(oppo);
+           if(blankCord[0]!=-1){
+            go(O, blankCord[0], blankCord[1]);
+           }else{
+            go(O,0,0);
+           }
+           printArray();
+    
+    
     }
 
-    void markRandom(int player) {
-        Random rand = new Random();
-        int col = rand.nextInt(3);
-        int row = rand.nextInt(3);
-        boolean res = mark(player, row, col);
-        if (!res) {
-            markRandom(player);
+    void cornerMove(int player,int corner){
+        int[][] corners = {
+            {0,0},
+            {0,2},
+            {2,0},
+            {2,2},
+            {0,0},
+            {0,2},
+            {2,0},
+            {2,2}
+        };
+        boolean res =go(player, corners[corner][0],corners[corner][1]);
+        
+        if(res){
+            // go()
         }
-    }
+           
+        }
 
-    boolean mark(int player, int row, int col) {
+    boolean go(int player, int row, int col) {
         if (board[row][col] != B) {
-            return false;
+            return true;
         }
-
         board[row][col] = player;
-        return true;
-    }
+        return false;
+    }   
 
-    boolean isWin(int player) {
+    int[] posWin(int player) {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (board[i][j] == player) {
-                    boolean res = checkWin(player, i, j);
-                    if (res) {
-                        return true;
+                    int[] res = _posWin(player, i, j);
+                    if (res[0]!=-1) {
+                        return res;
                     }
                 }
             }
         }
-        return false;
+        return new int[]{-1,-1};
     }
 
     boolean checkWin(int player, int row, int col) {
@@ -120,7 +124,7 @@ class OX {
             return true;
         }
 
-        // Check for diago
+        // Check for diagonal
         prod = 1;
 
         if ((row == 0 || row % 2 == 1) && (col == 0 || col % 2 == 1)) {
@@ -153,7 +157,7 @@ class OX {
         return false;
     }
 
-    int[] posWin(int player, int row, int col) {
+    int[] _posWin(int player, int row, int col) {
         int winnerProd = player * player * B;
         int prod = 1;
 
