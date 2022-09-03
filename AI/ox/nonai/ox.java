@@ -1,5 +1,3 @@
-import java.util.Arrays;
-import java.util.Random;
 import java.util.Scanner;
 
 public class ox {
@@ -14,12 +12,13 @@ class OX {
     int user;
     int oppo;
     Scanner scanner = new Scanner(System.in);
+
     OX() {
         // Row, Col
-        
+
         System.out.println("Select X or O");
         String selectedPlayer = scanner.next();
-        
+
         if (selectedPlayer.charAt(0) == 'X') {
             oppo = X;
         } else if (selectedPlayer.charAt(0) == 'O') {
@@ -32,91 +31,131 @@ class OX {
         startGame();
     }
 
-    void startGame(){
-           if(oppo == X){
-            int row = scanner.nextInt();
-            int col = scanner.nextInt();
-            go(oppo, row, col);
-            printArray();
+    void startGame() {
+        if (oppo == X) {
+            user();
             boolean mark = go(O, 1, 1);
-            if(mark){
-                go(O,0,0);
-                
+            if (mark) {
+                cornerMove(O, 0);
             }
-           }else{
+         else {
             go(X, 1, 1);
-            
-           }
-           printArray();
 
-           int row = scanner.nextInt();
-           int col = scanner.nextInt();
-           go(oppo, row, col);
-           printArray();
-           int[] blankCord = posWin(oppo);
-           if(blankCord[0]!=-1){
-            go(O, blankCord[0], blankCord[1]);
-           }else{
-            go(O,0,0);
-           }
-           printArray();
-    
-    
+        }
+
+        int[] blankCordX = user();
+        if (blankCordX[0] != -1) {
+            go(O, blankCordX[0], blankCordX[1]);
+        } else {
+            cornerMove(O, 2);
+        }
+
+        blankCordX= user();
+        int[] blankCordO = posWin(O);
+        if(blankCordO[0]!=-1){
+            go(O, blankCordO[0], blankCordO[1]);
+        }else if (blankCordX[0] != -1) {
+            go(O, blankCordX[0], blankCordX[1]);
+        } else if(!cornerMove(O, 3)){
+            makeMove(O);
+        }
+
+        user();
+        makeMove(O);
+        user();
+    }
+        
     }
 
-    void cornerMove(int player,int corner){
+    void makeMove(int player){
+        for(int row = 0; row<3; row++){
+            for(int col = 0; col<3; col++){
+                if(board[row][col] == B){
+                    go(player, row, col);
+                    return;
+                }
+            }
+        }
+    }
+
+    private int[] user() {
+        int row;
+        int col;
+        row = scanner.nextInt();
+        col = scanner.nextInt();
+        go(oppo, row, col);
+
+        return posWin(oppo);
+    }
+
+    boolean cornerMove(int player, int corner) {
         int[][] corners = {
-            {0,0},
-            {0,2},
-            {2,0},
-            {2,2},
-            {0,0},
-            {0,2},
-            {2,0},
-            {2,2}
+                { 0, 0 },
+                { 0, 2 },
+                { 2, 0 },
+                { 2, 2 },
+                { 0, 0 },
+                { 0, 2 },
+                { 2, 0 },
+                { 2, 2 }
         };
-        boolean res =go(player, corners[corner][0],corners[corner][1]);
-        
-        if(res){
-            // go()
+
+        while (true) {
+            boolean mark = go(player, corners[corner][0], corners[corner][1]);
+            if(!mark){
+                return true;
+            }
+            corner++;
+            if(corner>7){
+                return false;
+            }
         }
-           
-        }
+
+
+
+    }
 
     boolean go(int player, int row, int col) {
         if (board[row][col] != B) {
             return true;
         }
         board[row][col] = player;
+        printArray();
+        if(checkWin(player, row, col)){
+            System.out.printf("%c is Winner\n",getBoardChar(player));
+            System.exit(0);
+        };
+        
         return false;
-    }   
+
+    }
 
     int[] posWin(int player) {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (board[i][j] == player) {
+                if (board[i][j] == player||board[i][j] == B) {
                     int[] res = _posWin(player, i, j);
-                    if (res[0]!=-1) {
+                    if (res[0] != -1) {
                         return res;
                     }
                 }
             }
         }
-        return new int[]{-1,-1};
+        return new int[] { -1, -1 };
     }
 
     boolean checkWin(int player, int row, int col) {
         int winnerProd = player * player * player;
         int prod = 1;
-        // Check for horizontal;
+        // Check for Vertical;
         for (int c = 0; c < 3; c++) {
             prod *= board[row][c];
         }
         if (prod == winnerProd) {
             return true;
         }
-        prod = 1;
-        // Check for vertical;
+        prod = 1;   
+        // Check for Horizontal;
         for (int r = 0; r < 3; r++) {
             prod *= board[r][col];
         }
