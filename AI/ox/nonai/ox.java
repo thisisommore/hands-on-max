@@ -33,12 +33,19 @@ class OX {
 
     void startGame() {
         if (oppo == X) {
-            user();
-            boolean mark = go(O, 1, 1);
-            if (mark) {
-                cornerMove(O, 0);
-            }
-         else {
+            ifXoppo();
+        }else{
+            ifOoppo();
+        }
+
+    }
+
+    private void ifXoppo() {
+        user();
+        boolean mark = go(O, 1, 1);
+        if (mark) {
+            cornerMove(O, 0);
+        } else {
             go(X, 1, 1);
 
         }
@@ -50,13 +57,13 @@ class OX {
             cornerMove(O, 2);
         }
 
-        blankCordX= user();
+        blankCordX = user();
         int[] blankCordO = posWin(O);
-        if(blankCordO[0]!=-1){
+        if (blankCordO[0] != -1) {
             go(O, blankCordO[0], blankCordO[1]);
-        }else if (blankCordX[0] != -1) {
+        } else if (blankCordX[0] != -1) {
             go(O, blankCordX[0], blankCordX[1]);
-        } else if(!cornerMove(O, 3)){
+        } else if (!cornerMove(O, 3)) {
             makeMove(O);
         }
 
@@ -64,13 +71,42 @@ class OX {
         makeMove(O);
         user();
     }
+
+    private void ifOoppo() {
+        go(X, 1, 1);
+        user();
+        cornerMove(X, 0);
+
+        int[] blankCordO = user();
         
+
+        int[] blankCordX = posWin(X);
+        if (blankCordX[0] != -1) {
+            go(X, blankCordX[0], blankCordX[1]);
+        } else if (blankCordO[0] != -1) {
+            go(X, blankCordO[0], blankCordO[1]);
+        } else {
+            cornerMove(O, 3);
+        }
+
+        blankCordX = user();
+
+        if(blankCordX[0] != -1){
+            go(X, blankCordX[0],blankCordX[1]);
+        }else{
+            makeMove(X);
+        }
+        user();
+        makeMove(X);
     }
 
-    void makeMove(int player){
-        for(int row = 0; row<3; row++){
-            for(int col = 0; col<3; col++){
-                if(board[row][col] == B){
+
+
+
+    void makeMove(int player) {
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                if (board[row][col] == B) {
                     go(player, row, col);
                     return;
                 }
@@ -79,11 +115,15 @@ class OX {
     }
 
     private int[] user() {
-        int row;
-        int col;
-        row = scanner.nextInt();
-        col = scanner.nextInt();
-        go(oppo, row, col);
+        System.out.print("Row: ");
+        int row = scanner.nextInt();
+        System.out.print("Col: ");
+        int col = scanner.nextInt();
+        boolean marked = go(oppo, row, col);
+        if (marked) {
+            System.out.println("already marked !!");
+            return user();
+        }
 
         return posWin(oppo);
     }
@@ -102,16 +142,14 @@ class OX {
 
         while (true) {
             boolean mark = go(player, corners[corner][0], corners[corner][1]);
-            if(!mark){
+            if (!mark) {
                 return true;
             }
             corner++;
-            if(corner>7){
+            if (corner > 7) {
                 return false;
             }
         }
-
-
 
     }
 
@@ -121,11 +159,12 @@ class OX {
         }
         board[row][col] = player;
         printArray();
-        if(checkWin(player, row, col)){
-            System.out.printf("%c is Winner\n",getBoardChar(player));
+        if (checkWin(player)) {
+            System.out.printf("%c is Winner\n", getBoardChar(player));
             System.exit(0);
-        };
-        
+        }
+        ;
+
         return false;
 
     }
@@ -133,7 +172,7 @@ class OX {
     int[] posWin(int player) {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (board[i][j] == player||board[i][j] == B) {
+                if (board[i][j] == player || board[i][j] == B) {
                     int[] res = _posWin(player, i, j);
                     if (res[0] != -1) {
                         return res;
@@ -144,7 +183,25 @@ class OX {
         return new int[] { -1, -1 };
     }
 
-    boolean checkWin(int player, int row, int col) {
+    
+    boolean checkWin(int player) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == player || board[i][j] == B) {
+                    Boolean res = _checkWin(player, i, j);
+                    if (res) {
+                        return res;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+
+
+    boolean _checkWin(int player, int row, int col) {
         int winnerProd = player * player * player;
         int prod = 1;
         // Check for Vertical;
@@ -154,7 +211,7 @@ class OX {
         if (prod == winnerProd) {
             return true;
         }
-        prod = 1;   
+        prod = 1;
         // Check for Horizontal;
         for (int r = 0; r < 3; r++) {
             prod *= board[r][col];
@@ -166,7 +223,7 @@ class OX {
         // Check for diagonal
         prod = 1;
 
-        if ((row == 0 || row % 2 == 1) && (col == 0 || col % 2 == 1)) {
+        if ((row == 0 || row % 2 == 0) && (col == 0 || col % 2 == 0)) {
             if (row == 0 && col == 2) {
                 prod *= board[row][col];
                 int nR = 1, nC = 1;
