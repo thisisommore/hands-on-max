@@ -94,7 +94,7 @@ class OX {
         if(blankCordX[0] != -1){
             go(X, blankCordX[0],blankCordX[1]);
         }else{
-            makeMove(X);
+            cornerMove(X,4);
         }
         user();
         makeMove(X);
