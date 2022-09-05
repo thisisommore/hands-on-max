@@ -85,8 +85,8 @@ class OX {
             go(X, blankCordX[0], blankCordX[1]);
         } else if (blankCordO[0] != -1) {
             go(X, blankCordO[0], blankCordO[1]);
-        } else {
-            cornerMove(O, 3);
+        }else {
+            cornerMove(X, 3);
         }
 
         blankCordX = user();
